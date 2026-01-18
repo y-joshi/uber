@@ -1,8 +1,13 @@
+import { ClerkLoaded, ClerkProvider } from '@clerk/clerk-expo';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import '../global.css';
+
+const clerkPublishableKey = process.env
+  .EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY as string;
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -23,14 +28,22 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // if (!loaded) {
-  //   return null;
-  // }
+  if (!clerkPublishableKey) {
+    throw new Error(
+      'Clerk publishable key is not defined in environment variables',
+    );
+  }
 
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
-    </Stack>
+    <ClerkProvider publishableKey={clerkPublishableKey}>
+      <ClerkLoaded>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(root)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+        </Stack>
+      </ClerkLoaded>
+    </ClerkProvider>
   );
 }
