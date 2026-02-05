@@ -1,6 +1,5 @@
 import {
   Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Text,
@@ -26,7 +25,7 @@ const InputField = ({
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback>
         <View className="my-2 w-full">
           <Text className={`text-xl font-JakartaSemiBold mb-3 ${labelStyle}`}>
             {label}
