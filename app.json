@@ -19,18 +19,14 @@
     },
     "web": {
       "bundler": "metro",
-      "output": "static",
+      "output": "server",
       "favicon": "./assets/icon.png"
     },
     "plugins": [
-      "expo-router",
       [
-        "expo-splash-screen",
+        "expo-router",
         {
-          "backgroundColor": "#2F80ED",
-          "image": "./assets/splash.png",
-          "imageWidth": 200,
-          "resizeMode": "contain"
+          "origin": "https://uber.dev/"
         }
       ]
     ],

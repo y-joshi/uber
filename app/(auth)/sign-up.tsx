@@ -1,6 +1,7 @@
 import CustomButton from '@/components/CustomButton';
 import InputField from '@/components/InputField';
 import { icons, images } from '@/constants';
+import { fetchAPI } from '@/lib/fetch';
 import { useSignUp } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -36,7 +37,6 @@ const SignUp = () => {
         emailAddress: form.email,
         password: form.password,
       });
-
       // Send user an email with verification code
       await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
 
@@ -51,23 +51,39 @@ const SignUp = () => {
   // Handle submission of verification form
   const onVerifyPress = async () => {
     if (!isLoaded) return;
-
+    console.log('Attempting verification with code:', verification.code);
     try {
       // Use the code the user provided to attempt verification
       const signUpAttempt = await signUp.attemptEmailAddressVerification({
         code: verification.code,
       });
+      console.log('Status:', signUpAttempt.status);
 
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === 'complete') {
         // TODO: Create Database entry for User!
+        console.log('Verification complete, creating user in database.');
+        await fetchAPI('/(api)/user', {
+          method: 'POST',
+          body: JSON.stringify({
+            name: form.name,
+            email: form.email,
+            clerkId: signUpAttempt.createdUserId,
+          }),
+        });
+        console.log('User created in database.');
         await setActive({ session: signUpAttempt.createdSessionId });
         setVerification({ ...verification, state: 'success' });
         // router.replace('/');
       } else {
         // If the status is not complete, check why. User may need to
         // complete further steps.
+        console.log(
+          'Verification not complete:',
+          JSON.stringify(signUpAttempt, null, 2),
+        );
+
         setVerification({
           ...verification,
           error: 'Verfication failed',
@@ -80,7 +96,7 @@ const SignUp = () => {
       // for more info on error handling
       setVerification({
         ...verification,
-        error: err.errors[0]?.longMessage || 'Verification failed',
+        error: JSON.stringify(err, null, 2) || 'Verification failed',
         state: 'failed',
       });
       console.error(JSON.stringify(err, null, 2));
