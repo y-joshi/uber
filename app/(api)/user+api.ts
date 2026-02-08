@@ -2,10 +2,10 @@ import { neon } from '@neondatabase/serverless';
 
 export async function POST(request: Request) {
   try {
-    console.log('Processing user creation request');
+    // console.log('Processing user creation request');
     const sql = neon(`${process.env.DATABASE_URL}`);
     const { name, email, clerkId } = await request.json();
-    console.log('Received user data:', { name, email, clerkId });
+    // console.log('Received user data:', { name, email, clerkId });
     if (!name || !email || !clerkId) {
       return new Response('Missing required fields', { status: 400 });
     }

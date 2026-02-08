@@ -57,13 +57,13 @@ const SignUp = () => {
       const signUpAttempt = await signUp.attemptEmailAddressVerification({
         code: verification.code,
       });
-      console.log('Status:', signUpAttempt.status);
+      // console.log('Status:', signUpAttempt.status);
 
       // If verification was completed, set the session to active
       // and redirect the user
       if (signUpAttempt.status === 'complete') {
         // TODO: Create Database entry for User!
-        console.log('Verification complete, creating user in database.');
+        // console.log('Verification complete, creating user in database.');
         await fetchAPI('/(api)/user', {
           method: 'POST',
           body: JSON.stringify({
@@ -72,7 +72,7 @@ const SignUp = () => {
             clerkId: signUpAttempt.createdUserId,
           }),
         });
-        console.log('User created in database.');
+        // console.log('User created in database.');
         await setActive({ session: signUpAttempt.createdSessionId });
         setVerification({ ...verification, state: 'success' });
         // router.replace('/');
