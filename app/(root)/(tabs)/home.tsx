@@ -1,6 +1,9 @@
 import GoogleTextInput from '@/components/GoogleTextInput';
 import { icons, images } from '@/constants';
+import { useLocationStore } from '@/store';
 import { useUser } from '@clerk/clerk-expo';
+import * as Location from 'expo-location';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -125,11 +128,38 @@ const recentRides = [
 ];
 
 export default function Home() {
+  const { setUserLocation, setDestinationLocation } = useLocationStore();
+  const [hasPermission, setHasPermission] = useState(false);
   const { user } = useUser();
   const loading = false;
 
   const handleSignOut = async () => {};
   const handleDestinationPress = () => {};
+
+  useEffect(() => {
+    const requestLocation = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setHasPermission(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords?.latitude!,
+        longitude: location.coords?.longitude!,
+      });
+
+      setUserLocation({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        address: `${address[0].name}, ${address[0].region}}`,
+      });
+
+      requestLocation();
+    };
+  }, []);
 
   return (
     <SafeAreaView className="bg-general-500">
